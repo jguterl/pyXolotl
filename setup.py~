@@ -14,11 +14,11 @@ long_description = (here / 'README.md').read_text(encoding='utf-8')
 # Fields marked as "Optional" may be commented out.
 
 setup(
-    name='pyXolotl',
+    name='PyXolotl',
     version='1.0',
     setup_requires=[],
     description='',
-    py_modules=['Xolotl','XolotlSim','XolotlInput','XolotlRun','XolotlSim','XololPlot,XolotlOutput'],
+    py_modules=['Xolotl','XolotlSim','XolotlInput','XolotlRun','XolotlSim'],
     long_description=long_description,
     long_description_content_type='text/markdown',
     url='https://github.com/jguterl/pyXolotl/',
