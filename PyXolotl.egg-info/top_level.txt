@@ -1,4 +1,0 @@
-Xolotl
-XolotlInput
-XolotlRun
-XolotlSim
