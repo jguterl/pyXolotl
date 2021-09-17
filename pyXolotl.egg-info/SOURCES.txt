@@ -1,0 +1,10 @@
+README.md
+Xolotl.py
+XolotlInput.py
+XolotlRun.py
+XolotlSim.py
+setup.py
+pyXolotl.egg-info/PKG-INFO
+pyXolotl.egg-info/SOURCES.txt
+pyXolotl.egg-info/dependency_links.txt
+pyXolotl.egg-info/top_level.txt
