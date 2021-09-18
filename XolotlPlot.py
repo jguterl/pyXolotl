@@ -1,6 +1,8 @@
 import glob
 import os.path
 import h5py
+import numpy as np
+import matplotlib.pyplot as plt
 filename = '/home/guterlj/simulations/XOLOTL/onlyDtest/supertest/retentionOut.txt'
 
 class classinstancemethod(classmethod):
@@ -39,7 +41,7 @@ class XolotlPlot():
         return ax
     
     @classinstancemethod     
-    def plot_retention(self,datatype=['bulk','burst','surface','content'],kw=None, **kwargs):
+    def plot_retention(self,datatype=['bulk','burst','surface','content','fluxb','fluxs'],kw=None, **kwargs):
         if type(datatype) == str: datatype = [datatype]
         x,y=get_spdim(len(datatype))
         fig ,axes = plt.subplots(x,y)
@@ -116,9 +118,11 @@ class XolotlPlot():
         self._plot_retention_data('content', kw, ax, **kwargs)
         
     @classinstancemethod     
-    def plot_flux(self, kw=None, ax=None, **kwargs):
-        self._plot_retention_data('content', kw, ax, **kwargs)
-        
+    def plot_fluxb(self, kw=None, ax=None, **kwargs):
+        self._plot_retention_data('fluxb', kw, ax, **kwargs)
+    @classinstancemethod     
+    def plot_fluxs(self, kw=None, ax=None, **kwargs):
+        self._plot_retention_data('fluxs', kw, ax, **kwargs)    
         
         
     
@@ -127,6 +131,6 @@ class XolotlPlot():
     
     
 def get_spdim(nplots):
-    cols = int(ceil(sqrt(nplots)))
-    rows = int(ceil(nplots / cols))
+    cols = int(np.ceil(np.sqrt(nplots)))
+    rows = int(np.ceil(nplots / cols))
     return rows,cols

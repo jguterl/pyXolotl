@@ -8,18 +8,20 @@ Created on Fri Sep 10 21:59:00 2021
 import glob
 import os.path
 import h5py
-filename = '/home/guterlj/simulations/XOLOTL/onlyDtest/supertest/retentionOut.txt'
-
+import numpy as np
+from XolotlPlot import *
 class classinstancemethod(classmethod):
     def __get__(self, instance, type_):
         descr_get = super().__get__ if instance is None else self.__func__.__get__
         return descr_get(instance, type_)
-from XolotlPlot import *
+
 class XolotlOutput(XolotlPlot):
+    data_files={'retention':'retentionOut.txt', 'surface':'surface.txt'}
     def __init__(self, *args, **kwargs):
-        self.data_files={'retention':'retentionOut.txt', 'surface':'surface.txt'}
-        self.output = {}
         super(XolotlOutput, self).__init__(*args, **kwargs)
+        self.data_files=self.__class__.data_files
+        self.output = {}
+        
     
     @staticmethod
     def read_header(filename):
@@ -85,6 +87,8 @@ class XolotlOutput(XolotlPlot):
 
     @classinstancemethod
     def load_outputfile(self,case_path):
+        if not hasattr(self,'output'):
+            self.output = {}
         for k,v in self.data_files.items():
             self.output[k] = self.read_outputfile(os.path.join(case_path,v)) 
     @classinstancemethod
@@ -96,8 +100,15 @@ class XolotlOutput(XolotlPlot):
         self.case_path = case_path
         self.load_outputfile(case_path)
         self.load_profiles(case_path)
+        self.get_flux()
         
-            
+    @classinstancemethod     
+    def get_flux(self):
+        species = ['Helium', 'Deuterium', 'Vacancy', 'Interstitial']
+        for s in species:
+            self.output['retention']['{}_fluxb'.format(s)] = np.gradient(self.output['retention']['{}_bulk'.format(s)],self.output['retention']['fluence'])
+            self.output['retention']['{}_fluxs'.format(s)] = np.gradient(self.output['retention']['{}_surface'.format(s)],self.output['retention']['fluence'])
+        
             
 
         

@@ -61,6 +61,7 @@ class XolotlRun(SimMonitoring):
         def setup(self, runner='process',name_suffix='id', **kwargs):
             self.check_xolotl_exec()
             self.set_directory()
+            self.set_tridyn()
             self.list_scan = self.get_list_scan(self.param_scan)
             
             self.create_sim(name_suffix, **kwargs)

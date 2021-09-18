@@ -7,7 +7,89 @@ Created on Fri Sep 10 00:23:26 2021
 """
 from SimManager2 import *
 import re
-class XolotlInput():
+
+class XolotlFlux():    
+    @classinstancemethod
+    def generate_particle_flux(self,time, func, **kwargs):
+        if type(func) == np.ndarray:
+            return func
+        else:
+            return func(time,**kwargs)
+    
+    @classinstancemethod
+    def set_particle_flux(self, flux, t=None, filename=None,**kwargs):
+        if t is None:
+            assert flux > 0.0
+            self.input_params['flux'] = flux
+        else:
+            if self.input_params.get('flux') is not None:
+                self.input_params.pop('flux')
+            self.inputpflux['time'] =  t
+            self.inputpflux['flux'] =  self.generate_particle_flux(t, flux, **kwargs)
+            self.set_flux_file(filename)
+            self._write_flux_file(self.input_files['fluxfile'],self.inputpflux['time'],self.inputpflux['flux'])
+            
+    @classinstancemethod
+    def _write_flux_file(self,filename,time,flux):
+        assert time.shape == flux.shape
+        np.savetxt(filename,np.vstack((time,flux)).T)
+        
+    @classinstancemethod
+    def set_flux_file(self,filename=None):
+        if filename is None:
+            filename = 'influx.txt'        
+        self.input_files['fluxfile'] = os.path.join(self.tmp_folder,filename)
+        self.input_params['fluxFile'] = os.path.basename(filename)
+
+class XolotlTridyn():
+    
+    @classinstancemethod
+    def set_tridyn(self, filename=None):
+        assert hasattr(self,'input_tridyn')
+        self.set_tridyn_file(filename)
+        assert self.input_files.get('tridynfile') is not None
+        self.write_tridyn_file(self.input_files['tridynfile'], self.input_tridyn)
+            
+    @classinstancemethod
+    def set_tridyn_file(self,filename=None):
+        if filename is None:
+            if self.input_params.get('fluxDepthProfileFilePath') is None:
+                filename = 'tridyn.txt' 
+            else:
+                filename = os.path.basename(self.input_params['fluxDepthProfileFilePath'])
+        self.input_params['fluxDepthProfileFilePath'] = filename        
+        self.input_files['tridynfile'] = os.path.join(self.tmp_folder,filename)
+            
+            
+    @classinstancemethod
+    def write_tridyn_file(self,filename, dic):
+        f = open(filename,'w')
+        for k,v in dic.items():
+            f.write('{} {} {}\n'.format(k,v['charge'],v['fraction']))
+            f.write('{} {}\n'.format(' '.join([str(c) for c in v['coeff']]),v['cutoff']))
+        f.close()
+
+    
+    @classinstancemethod
+    def read_tridyn_file(self,filename):
+        lines = self._read_file(filename)
+        nspecies = len(lines) //2
+        print('tridyn file: {} nspecies:{}'.format(filename,nspecies))
+        d = {}
+        for i in range(nspecies):
+          (s,q,f) = lines[2*(i+1)-2].split('#')[0].rstrip().split()
+          coeffs = lines[2*(i+1)-1].split('#')[0].rstrip().split()
+          cutoff = coeffs[-1]
+          coeffs = coeffs[:-1]
+          d[s] = {'charge':q,'fraction':f,'coeff':coeffs,'cutoff':cutoff}
+        return d
+    
+    @classinstancemethod
+    def load_tridyn_file(self,filename):
+        self.input_tridyn = self.read_tridyn_file(filename)
+        self.input_params['fluxDepthProfileFilePath'] = filename
+
+class XolotlInput(XolotlFlux, XolotlTridyn):
     def __init__(self, paramdef_file='/fusion/projects/boundary/guterlj/parameters_def.txt'):
        super(XolotlInput, self).__init__()
        self.def_params = self.read_paramdef(paramdef_file)
@@ -25,6 +107,7 @@ class XolotlInput():
         for k,v in gen:
             print('{} : {}'.format(k,v))
             
+    @classinstancemethod        
     def get_input_params(self,inputdata:dict or str)-> None:
         if type(inputdata==dict):
            self.input_params = inputdata
@@ -42,15 +125,17 @@ class XolotlInput():
             elif type(v) == str:
                  L.append(k+'='+v)
             elif type(v) == dict:
-                L.append(k+'='+" ".join(['-'+kk+" "+vv for kk,vv in v.items()]))
+                L.append(k+'='+" ".join(['-'+kk+" "+str(vv) for kk,vv in v.items()]))
         return L
     
+    @classinstancemethod
     def write_input_params(self, filename:str, input_params:dict or None=None)->None:
         assert input_params is None or type(input_params) == dict
         if input_params is None:
             input_params = self.input_params
         if self.verbose: print('filename in_write_input_params:',filename)
         self._write_file(filename, self._reformat_input_params(input_params))
+    
             
     @staticmethod
     def _read_file(filename:str)->list:
@@ -177,7 +262,8 @@ class XolotlInput():
                 
     def _set_paramdef(self,filename='/fusion/projects/boundary/guterlj/parameters_def.txt'):
         self.def_params = self.read_paramdef(filename)
-    @staticmethod    
+    
+    @staticmethod  
     def get_platform():
         PF={}
         AllFunctions = inspect.getmembers(platform, inspect.isfunction)
@@ -188,42 +274,9 @@ class XolotlInput():
                 except:
                     pass
         return PF
-    
+         
 
-        
-            
-    @classinstancemethod
-    def set_flux_file(self,filename=None):
-        if filename is None:
-            filename = 'influx.txt'        
-            self.input_files['fluxfile'] = os.path.join(self.tmp_folder,filename)
-            self.input_params['fluxFile'] = os.path.basename(filename)
-            
-    @classinstancemethod
-    def _write_flux_file(self,filename,time,flux):
-        assert time.shape == flux.shape
-        np.savetxt(filename,np.vstack((time,flux)).T)
-        
-    @classinstancemethod
-    def generate_particle_flux(self,time, func, **kwargs):
-        if type(func) == np.ndarray:
-            return func
-        else:
-            return func(time,**kwargs)
-    
-    @classinstancemethod
-    def set_particle_flux(self, flux, t=None, filename=None,**kwargs):
-        if t is None:
-            assert flux > 0.0
-            self.input_params['flux'] = flux
-        else:
-            if self.input_params.get('flux') is not None:
-                self.input_params.pop('flux')
-            self.inputpflux['time'] =  t
-            self.inputpflux['flux'] =  self.generate_particle_flux(t, flux, **kwargs)
-            self.set_flux_file(filename)
-            self._write_flux_file(self.input_files['fluxfile'],self.inputpflux['time'],self.inputpflux['flux'])
-        
+
     
     
     
