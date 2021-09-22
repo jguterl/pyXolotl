@@ -7,8 +7,7 @@ Created on Fri Sep 10 00:23:26 2021
 """
 from SimManager2 import *
 import re
-param_Def = 
-{'dimensions': ' The number of dimensions for the simulation. Can be 0 (no dimension), 1, 2, 3. Note: 0 dimension cannot be run in parallel.',
+param_def = {'dimensions': ' The number of dimensions for the simulation. Can be 0 (no dimension), 1, 2, 3. Note: 0 dimension cannot be run in parallel.',
  'gridType': ' Grid type to use along X. (default = uniform; available uniform,nonuniform,geometric,cheby,read.',
  'gridParam': ' At most six parameters for the grid. Alternatives: uniform -> nX hX; nonuniform -> nX; geometric -> nX ratio; cheby -> nX width. The four additional parameters are for a uniform grid in Y and Z -> nY hY nZ hZ.',
  'boundary': ' This option allows the user to choose the boundary conditions. The first one correspond to the left side (surface) and second one to the right (bulk), then two for Y and two for Z. 0 means mirror or periodic, 1 means free surface.',
