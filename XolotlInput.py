@@ -47,14 +47,18 @@ class XolotlTridyn():
     def set_tridyn(self, filename=None):
         assert hasattr(self,'input_tridyn')
         self.set_tridyn_file(filename)
-        assert self.input_files.get('tridynfile') is not None
-        self.write_tridyn_file(self.input_files['tridynfile'], self.input_tridyn)
+        if self.input_files.get('tridynfile') is not None:
+            self.write_tridyn_file(self.input_files['tridynfile'], self.input_tridyn)
             
     @classinstancemethod
     def set_tridyn_file(self,filename=None):
         if filename is None:
             if self.input_params.get('fluxDepthProfileFilePath') is None:
                 filename = 'tridyn.txt' 
+            elif self.input_params.get('fluxDepthProfileFilePath')=='':
+                self.input_params.pop('fluxDepthProfileFilePath')
+                self.input_files['tridynfile'] = None
+                return
             else:
                 filename = os.path.basename(self.input_params['fluxDepthProfileFilePath'])
         self.input_params['fluxDepthProfileFilePath'] = filename        
@@ -121,11 +125,14 @@ class XolotlInput(XolotlFlux, XolotlTridyn):
         for k,v in inputdata.items() :
             if k=='filename': continue
             if type(v) == list :
-             L.append(k+'='+" ".join(v))
+             L.append(k+'='+" ".join([str(vv) for vv in v]))
             elif type(v) == str:
                  L.append(k+'='+v)
             elif type(v) == dict:
                 L.append(k+'='+" ".join(['-'+kk+" "+str(vv) for kk,vv in v.items()]))
+            else:
+                 L.append(k+'='+str(v))
+            
         return L
     
     @classinstancemethod
@@ -135,7 +142,6 @@ class XolotlInput(XolotlFlux, XolotlTridyn):
             input_params = self.input_params
         if self.verbose: print('filename in_write_input_params:',filename)
         self._write_file(filename, self._reformat_input_params(input_params))
-    
             
     @staticmethod
     def _read_file(filename:str)->list:

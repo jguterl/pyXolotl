@@ -29,8 +29,8 @@ class XolotlPlot():
         
         ## Formatting
         ax.set_xlabel("Depth [nm]",fontsize=25)
-        ax.set_ylabel("Concentration [atoms/nm3]",fontsize=25)
-        ax.set_yscale('log')
+        ax.set_ylabel("Concentration [atoms/nm3]",fontsize=12)
+        ax.set_yscale('symlog')
         #plotDist.set_yscale('log')
         #plotDist.set_xlim([0.0, 1000.0])
         #plotDist.set_ylim([0.0, 0.15])
@@ -62,8 +62,10 @@ class XolotlPlot():
     
         data = self.output['retention']
         for k in contents:
-            ax.plot(data['fluence'], data[k], ls='-', lw=4, marker='.', markersize=10, alpha=0.5, label=k)
-
+            try:
+                ax.plot(data['fluence'], data[k], ls='-', lw=4, marker='.', markersize=10, alpha=0.5, label=k)
+            except:
+                print('cannot plot retention:{}'.format(k))
     @classinstancemethod     
     def _plot_retention_data(self, datatype, kw=None, ax=None, yscale='linear' ,xscale='linear',units=''):
         species = ['Helium', 'Deuterium', 'Vacancy', 'Interstitial']

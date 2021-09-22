@@ -106,9 +106,15 @@ class XolotlOutput(XolotlPlot):
     def get_flux(self):
         species = ['Helium', 'Deuterium', 'Vacancy', 'Interstitial']
         for s in species:
-            self.output['retention']['{}_fluxb'.format(s)] = np.gradient(self.output['retention']['{}_bulk'.format(s)],self.output['retention']['fluence'])
-            self.output['retention']['{}_fluxs'.format(s)] = np.gradient(self.output['retention']['{}_surface'.format(s)],self.output['retention']['fluence'])
-        
+            try:
+                self.output['retention']['{}_fluxb'.format(s)] = np.gradient(self.output['retention']['{}_bulk'.format(s)],self.output['retention']['fluence'])
+            except:
+                pass
+            try:
+                self.output['retention']['{}_fluxs'.format(s)] = np.gradient(self.output['retention']['{}_surface'.format(s)],self.output['retention']['fluence'])
+            except:
+                pass
+                
             
 
         

@@ -48,6 +48,11 @@ class XolotlRun(SimMonitoring):
                 self.directory = os.path.abspath(self.casename)
             if self.verbose: print('directory:',self.directory)
             
+        def get_directory(self):
+            if not hasattr(self,'directory') or self.directory is None:
+                self.set_directory()
+            return self.directory
+            
         @staticmethod    
         def get_list_scan(param_scan:dict)->list:
             assert type(param_scan) == dict
@@ -58,8 +63,12 @@ class XolotlRun(SimMonitoring):
             list_params = [[(k,vv) for vv in v] for k,v in param_scan.items()]
             return [dict((pp[0],pp[1]) for pp in p) for i,(idx, p) in enumerate(enumerated_product(*list_params))]
         
+        def setup_slurm(self,command_slurm, **kwargs):
+            self.setup(runner='slurm', list_commands = command_slurm, **kwargs)
+    
         def setup(self, runner='process',name_suffix='id', **kwargs):
-            self.check_xolotl_exec()
+            if runner == 'process':
+                self.check_xolotl_exec()
             self.set_directory()
             self.set_tridyn()
             self.list_scan = self.get_list_scan(self.param_scan)
@@ -83,16 +92,24 @@ class XolotlRun(SimMonitoring):
             [s.setup(**kwargs) for s in self.simulations]
         
         def set_sim_runner(self,runner='process', **kwargs):
+            self.runner = runner
             [s.set_runner(runner, env_list = self.env_list, **kwargs) for s in self.simulations]
             
 
-        def start(self):
+        def start(self, **kwargs):
+            assert self.runner == 'process' ,'use sbatch to launch simulations with slurm'
             self.tstart = time.time()
             if all([s.runner_ok for s in self.simulations]):
                 [s.runner.start() for s in self.simulations]
             else:
                 raise ValueError('runner not ok for simulations {}'.format(s.name))
-                
+        def sbatch(self, **kwargs):
+            assert self.runner == 'slurm' ,'use start to launch simulations through  shell process'
+            self.tstart = time.time()
+            if all([s.runner_ok for s in self.simulations]):
+                [s.runner.start(**kwargs) for s in self.simulations]
+            else:
+                raise ValueError('runner not ok for simulations {}'.format(s.name))        
         def stop(self):
             [s.runner.stop() for s in self.simulations]
             
