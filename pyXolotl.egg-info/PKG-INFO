@@ -6,6 +6,7 @@ Home-page: https://github.com/jguterl/pyXolotl/
 Author: J. Guterl
 Author-email: guterlj@fusion.gat.com
 License: UNKNOWN
+Description: UNKNOWN
 Keywords: sample,setuptools,development
 Platform: UNKNOWN
 Classifier: Development Status :: 4 - Beta
@@ -18,6 +19,3 @@ Classifier: Programming Language :: Python :: 3.8
 Classifier: Programming Language :: Python :: 3 :: Only
 Requires-Python: >=3.5, <4
 Description-Content-Type: text/markdown
-
-UNKNOWN
-

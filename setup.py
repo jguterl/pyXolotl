@@ -18,7 +18,7 @@ setup(
     version='1.0',
     setup_requires=[],
     description='',
-    py_modules=['Xolotl','XolotlSim','XolotlInput','XolotlRun','XolotlSim','XololPlot,XolotlOutput'],
+    py_modules=['Xolotl','XolotlSim','XolotlInput','XolotlRun','XolotlSim','XolotlPlot','XolotlOutput'],
     long_description=long_description,
     long_description_content_type='text/markdown',
     url='https://github.com/jguterl/pyXolotl/',

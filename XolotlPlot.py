@@ -23,21 +23,22 @@ class XolotlPlot():
         ax = plt.subplot(111)
         data = self.output['profile']
         for k in [k for k in data.keys() if k!='depth' and k!='filename']:
-            print(k)
+            #print(k)
             ax.plot(data['depth'], data[k], ls='-', lw=4, marker='.', markersize=10, alpha=0.5, label=k)
 
         
         ## Formatting
-        ax.set_xlabel("Depth [nm]",fontsize=25)
+        ax.set_xlabel("Depth [nm]",fontsize=12)
         ax.set_ylabel("Concentration [atoms/nm3]",fontsize=12)
         ax.set_yscale('symlog')
+        ax.set_xscale('symlog')
         #plotDist.set_yscale('log')
         #plotDist.set_xlim([0.0, 1000.0])
         #plotDist.set_ylim([0.0, 0.15])
         #plotDist.grid()
         ax.legend()
-        ax.tick_params(axis='both', which='major', labelsize=25)
-        ax.tick_params(axis='both', which='minor', labelsize=25)
+        ax.tick_params(axis='both', which='major', labelsize=12)
+        ax.tick_params(axis='both', which='minor', labelsize=12)
         return ax
     
     @classinstancemethod     
@@ -59,13 +60,20 @@ class XolotlPlot():
                 kw = [kw]
         assert type(kw) == list
         assert all([k in contents for k in kw])
-    
         data = self.output['retention']
+        if data.get('time') is not None:
+            x = data.get('time')
+            xaxis_str= 'time [s]'
+        else:
+            x = data.get('fluence')
+            xaxis_str= 'fluence [nm^{-2}]'
+        
         for k in contents:
             try:
-                ax.plot(data['fluence'], data[k], ls='-', lw=4, marker='.', markersize=10, alpha=0.5, label=k)
+                ax.plot(x, data[k], ls='-', lw=4, marker='.', markersize=10, alpha=0.5, label=k)
             except:
                 print('cannot plot retention:{}'.format(k))
+        ax.set_xlabel(xaxis_str)
     @classinstancemethod     
     def _plot_retention_data(self, datatype, kw=None, ax=None, yscale='linear' ,xscale='linear',units=''):
         species = ['Helium', 'Deuterium', 'Vacancy', 'Interstitial']
@@ -124,7 +132,13 @@ class XolotlPlot():
         self._plot_retention_data('fluxb', kw, ax, **kwargs)
     @classinstancemethod     
     def plot_fluxs(self, kw=None, ax=None, **kwargs):
-        self._plot_retention_data('fluxs', kw, ax, **kwargs)    
+        self._plot_retention_data('fluxs', kw, ax, **kwargs)   
+        
+    @classinstancemethod     
+    def plot_influx(self, kw=None, ax=None, **kwargs):
+        if ax is None:
+            ax = plt.gca()
+        ax.plot(self.output['influx'][:,0],self.output['influx'][:,1], label='influx')
         
         
     

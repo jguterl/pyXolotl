@@ -16,6 +16,7 @@ class XolotlRun(SimMonitoring):
             self.casename = None
             self.env_list = []
             self.setup_monitoring()
+            self.verbose = False
           
               #self.base_folder = 
         def add_env_variable(self,varname,varvalue):

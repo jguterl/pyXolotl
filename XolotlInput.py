@@ -82,10 +82,12 @@ class XolotlTridyn():
     
     @classinstancemethod
     def set_tridyn(self, filename=None):
-        assert hasattr(self,'input_tridyn')
         self.set_tridyn_file(filename)
+          
         if self.input_files.get('tridynfile') is not None:
-            self.write_tridyn_file(self.input_files['tridynfile'], self.input_tridyn)
+                self.write_tridyn_file(self.input_files['tridynfile'], self.input_tridyn)
+        else:
+            print('skipping trydin input')
             
     @classinstancemethod
     def set_tridyn_file(self,filename=None):

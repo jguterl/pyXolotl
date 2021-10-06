@@ -1,6 +1,8 @@
 README.md
 Xolotl.py
 XolotlInput.py
+XolotlOutput.py
+XolotlPlot.py
 XolotlRun.py
 XolotlSim.py
 setup.py

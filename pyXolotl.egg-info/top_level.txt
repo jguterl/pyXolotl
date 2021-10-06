@@ -1,4 +1,6 @@
 Xolotl
 XolotlInput
+XolotlOutput
+XolotlPlot
 XolotlRun
 XolotlSim

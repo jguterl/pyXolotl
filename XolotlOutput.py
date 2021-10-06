@@ -39,8 +39,10 @@ class XolotlOutput(XolotlPlot):
         if len(data.shape)>1:
             return dict((f,data[:,i]) for i,f in  enumerate(fields))
         else:
-            return dict((f,data[i]) for i,f in  enumerate(fields))
-    
+            if data.shape[0] >0:
+                return dict((f,data[i]) for i,f in  enumerate(fields))
+            else:
+                return {}
     @classinstancemethod
     def read_outputfile(self, filename):
         print('Reading output from {}'.format(filename))
@@ -101,19 +103,36 @@ class XolotlOutput(XolotlPlot):
         self.load_outputfile(case_path)
         self.load_profiles(case_path)
         self.get_flux()
+        self.get_influx(casepath=case_path)
+        
+     
         
     @classinstancemethod     
     def get_flux(self):
         species = ['Helium', 'Deuterium', 'Vacancy', 'Interstitial']
         for s in species:
             try:
-                self.output['retention']['{}_fluxb'.format(s)] = np.gradient(self.output['retention']['{}_bulk'.format(s)],self.output['retention']['fluence'])
+                self.output['retention']['{}_fluxb'.format(s)] = np.gradient(self.output['retention']['{}_bulk'.format(s)],self.output['retention']['time'])
             except:
                 pass
             try:
-                self.output['retention']['{}_fluxs'.format(s)] = np.gradient(self.output['retention']['{}_surface'.format(s)],self.output['retention']['fluence'])
+                self.output['retention']['{}_fluxs'.format(s)] = np.gradient(self.output['retention']['{}_surface'.format(s)],self.output['retention']['time'])
             except:
                 pass
+            
+    @classinstancemethod     
+    def get_influx(self, filename='influx.txt', casepath=None):
+            if casepath is None:
+                casepath = os.path.join(self.basefolder,self.casename)
+            try :
+                filepath = os.path.join(casepath,filename)
+                self.output['influx'] = np.loadtxt(filepath)
+                print('Influx data read from {}'.format(filepath))
+           
+            except:
+                self.output['influx'] = None
+                print('Cannot read influx data from {}'.format(filepath))
+            
                 
             
 
