@@ -8,7 +8,7 @@ Created on Tue Oct  5 12:16:59 2021
 
 import h5py, time
 Dfile='/global/u2/j/jguterl/simulations/Xolotl/D_modif/ELM_p/ELM_1/xolotlStop.h5'
-src='/global/homes/j/jguterl/simulations/Xolotl/He_loading/600K/runlong2b_1/xolotlStop.h5'
+src='/global/cscratch1/sd/jguterl/Xolotl/data/He_loading/600K/runlong2b_1/xolotlStop_refurbish.h5'
 
 def upgrade_h5file(h5file,attrs_file,dest=None):
     
@@ -40,8 +40,19 @@ def upgrade_h5file(h5file,attrs_file,dest=None):
     list_attrs = get_grp_attrs(attrs_file)
     add_grp_attrs(dest,list_attrs)
     
+    
+def reset_time(h5file, time=0.0, dt=1e-10):
+    data = h5py.File(h5file,'r+')
+    lastTimeStep = data['concentrationsGroup'].attrs['lastTimeStep']
+    print('Resetting timestep in concentration_{}'.format(lastTimeStep))
+    data['concentrationsGroup']['concentration_{}'.format(lastTimeStep)].attrs['absoluteTime'] = time
+    data['concentrationsGroup']['concentration_{}'.format(lastTimeStep)].attrs['deltaTime'] = dt
+    data['concentrationsGroup']['concentration_{}'.format(lastTimeStep)].attrs['previousTime'] = time-dt
+    data.close()
 
 
+src='/global/cscratch1/sd/jguterl/Xolotl/data/He_loading/600K/runlong2b_1/xolotlStop_refurbish.h5'
+reset_time(src)
 
 
 
