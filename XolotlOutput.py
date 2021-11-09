@@ -60,7 +60,7 @@ class XolotlOutput(XolotlPlot):
         data['depth'] = []
         data['He'] = []
         data['D'] = []
-        data['T'] = []
+        #data['T'] = []
         data['V'] = []
         data['I'] = []
         ## Read the data and put it in lists
@@ -68,9 +68,9 @@ class XolotlOutput(XolotlPlot):
             data['depth'].append(concDset[j][0])
             data['He'].append(concDset[j][1]) ## 1 for He, 2 for D, 3 for T, 4 for V, 5 for I, depending on the network
             data['D'].append(concDset[j][2])
-            data['T'].append(concDset[j][3])
-            data['V'].append(concDset[j][4])
-            data['I'].append(concDset[j][5])
+            #data['T'].append(concDset[j][3])
+            data['V'].append(concDset[j][3])
+            data['I'].append(concDset[j][4])
         data['filename'] = filename
         return data
     @classinstancemethod

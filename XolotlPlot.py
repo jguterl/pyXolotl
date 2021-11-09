@@ -18,20 +18,24 @@ class XolotlPlot():
     
    
     @classinstancemethod     
-    def plot_profiles(self):
+    def plot_profiles(self, yscale='symlog',xscale='symlog'):
         fig = plt.figure()
         ax = plt.subplot(111)
         data = self.output['profile']
-        for k in [k for k in data.keys() if k!='depth' and k!='filename']:
-            #print(k)
+        print(self.output['profile']['He'][52])
+        print(data.keys())
+        List= [kk for kk in data.keys() if kk!='depth' and kk!='filename']
+        print(List)
+        for k in List:
+            print(k,data[k])
             ax.plot(data['depth'], data[k], ls='-', lw=4, marker='.', markersize=10, alpha=0.5, label=k)
 
         
         ## Formatting
         ax.set_xlabel("Depth [nm]",fontsize=12)
         ax.set_ylabel("Concentration [atoms/nm3]",fontsize=12)
-        ax.set_yscale('symlog')
-        ax.set_xscale('symlog')
+        ax.set_yscale(yscale)
+        ax.set_xscale(xscale)
         #plotDist.set_yscale('log')
         #plotDist.set_xlim([0.0, 1000.0])
         #plotDist.set_ylim([0.0, 0.15])
@@ -49,6 +53,8 @@ class XolotlPlot():
         _axes = axes.flatten()
         for i,k in enumerate(datatype):
             getattr(self,'plot_{}'.format(k))(kw=kw,ax=_axes[i],**kwargs)
+        if self.case_path is not None:   
+            fig.suptitle(self.case_path, fontsize=14)  
             
     @classinstancemethod     
     def _plot_vs_fluence(self, contents, ax,kw=None  ):
@@ -75,8 +81,8 @@ class XolotlPlot():
                 print('cannot plot retention:{}'.format(k))
         ax.set_xlabel(xaxis_str)
     @classinstancemethod     
-    def _plot_retention_data(self, datatype, kw=None, ax=None, yscale='linear' ,xscale='linear',units=''):
-        species = ['Helium', 'Deuterium', 'Vacancy', 'Interstitial']
+    def _plot_retention_data(self, datatype, kw=None, ax=None, yscale='linear' ,xscale='linear',units='',species = ['Helium', 'Deuterium', 'Vacancy', 'Interstitial']):
+        
         contents =['{}_{}'.format(k,datatype) for k in species if not (k in ['Vacancy','Interstitial'] and datatype=='burst')]
         if ax is None:
             fig,_ax = plt.subplots(1)
@@ -87,8 +93,8 @@ class XolotlPlot():
         
     
     @classinstancemethod     
-    def _plot_retention_data(self, datatype, kw=None, ax=None, yscale='linear' ,xscale='linear',units=''):
-        species = ['Helium', 'Deuterium', 'Vacancy', 'Interstitial']
+    def _plot_retention_data(self, datatype,kw=None, ax=None, yscale='linear' ,xscale='linear',units='', species = ['Helium', 'Deuterium', 'Vacancy', 'Interstitial'],):
+        
         contents =['{}_{}'.format(k,datatype) for k in species if not (k in ['Vacancy','Interstitial'] and datatype=='burst')]
         if ax is None:
             fig,_ax = plt.subplots(1)
@@ -101,7 +107,7 @@ class XolotlPlot():
         ## Formatting
         _ax.set_ylabel('{} [{}]'.format(datatype,units))
         _ax.set_yscale(yscale)
-        _ax.set_xscale('symlog')
+        _ax.set_xscale(xscale)
         #plotDist.set_yscale('log')
         #plotDist.set_xlim([0.0, 1000.0])
         #plotDist.set_ylim([0.0, 0.15])
@@ -113,7 +119,7 @@ class XolotlPlot():
         
     @classinstancemethod     
     def plot_bulk(self, kw=None, ax=None, **kwargs):
-        self._plot_retention_data('bulk', kw, ax, **kwargs)
+        self._plot_retention_data('bulk',  kw, ax, **kwargs)
         
     @classinstancemethod     
     def plot_burst(self, kw=None, ax=None, **kwargs):
