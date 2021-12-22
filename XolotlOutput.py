@@ -92,7 +92,10 @@ class XolotlOutput(XolotlPlot):
         if not hasattr(self,'output'):
             self.output = {}
         for k,v in self.data_files.items():
-            self.output[k] = self.read_outputfile(os.path.join(case_path,v)) 
+            try:
+                self.output[k] = self.read_outputfile(os.path.join(case_path,v))
+            except:
+                print('skipping "{}" in "{}"'.format(k,v))
     @classinstancemethod
     def load_data(self,case_path=None):
         if case_path is None:
