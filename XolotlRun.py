@@ -8,6 +8,7 @@ Created on Fri Sep 10 00:40:50 2021
 import shutil
 from XolotlSim import *
 from SimManager2 import SimMonitoring
+
 class XolotlRun(SimMonitoring):
         def __init__(self):
             super(XolotlRun, self).__init__()
@@ -17,6 +18,7 @@ class XolotlRun(SimMonitoring):
             self.env_list = []
             self.setup_monitoring()
             self.verbose = False
+            self.directory = None
           
               #self.base_folder = 
         def add_env_variable(self,varname,varvalue):
@@ -41,13 +43,17 @@ class XolotlRun(SimMonitoring):
         def set_casename(self, casename:str):
             self.casename = casename
             
-        def set_directory(self):
-            assert self.casename is not None
-            if self.basefolder is not None:
-                self.directory = os.path.join(self.basefolder,self.casename)
-            else:
-                self.directory = os.path.abspath(self.casename)
-            if self.verbose: print('directory:',self.directory)
+        def set_directory(self, directory=None):
+            if self.directory is None and directory is None:
+                assert self.casename is not None
+                if self.basefolder is not None:
+                    self.directory = os.path.join(self.basefolder,self.casename)
+                else:
+                    self.directory = os.path.abspath(self.casename)
+                if self.verbose: print('directory:',self.directory)
+            elif directory is not None:
+                self.directory = directory
+                
             
         def get_directory(self):
             if not hasattr(self,'directory') or self.directory is None:
@@ -66,7 +72,10 @@ class XolotlRun(SimMonitoring):
         
         def setup_slurm(self,command_slurm, **kwargs):
             self.setup(runner='slurm', list_commands = command_slurm, **kwargs)
-    
+            
+        def setup_slurm_parallel(self, **kwargs):
+            self.setup(runner='slurm_parallel', check_exec_xolotl=False, **kwargs)
+        
         def setup(self, runner='process',name_suffix='id', **kwargs):
             if runner == 'process':
                 self.check_xolotl_exec()
@@ -94,6 +103,7 @@ class XolotlRun(SimMonitoring):
         
         def set_sim_runner(self,runner='process', **kwargs):
             self.runner = runner
+
             [s.set_runner(runner, env_list = self.env_list, **kwargs) for s in self.simulations]
             
 

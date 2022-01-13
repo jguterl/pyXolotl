@@ -14,13 +14,15 @@ class XolotlSim(XolotlInput, SimManagerUtils):
         self.setup_ok = False
         self.runner_ok = False
         self.list_commands = list_commands
-        for k,v in kwargs:
+        self.check_exec_xolotl = True
+        print(kwargs)
+        for k,v in kwargs.items():
             if hasattr(self,k):
                 setattr(self,k,v)
                 
                 
     def check_xolotl_exec(self):
-            if shutil.which(self.xolotl_exec) is None:
+            if self.check_exec_xolotl and shutil.which(self.xolotl_exec) is None:
                 raise ValueError('The xolotl executable {} was not found... use set_xolotl_exec to set it.')
                 
     
@@ -48,7 +50,10 @@ class XolotlSim(XolotlInput, SimManagerUtils):
             self.runner = SimProcRunner(self.command, self.directory, **kwargs)
         elif runner == 'slurm':
             self.runner = SimSlurmRunner(self.command, self.directory, **kwargs)
+        elif runner == 'slurm_parallel':
+            pass
         else:
+           
             raise ValueError('runner must be either "process" or "slurm"')
             
         self.runner_ok = True

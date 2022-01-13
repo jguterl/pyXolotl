@@ -45,6 +45,15 @@ param_def = {'dimensions': ' The number of dimensions for the simulation. Can be
  'fissionYield': ' The number of xenon created for each fission (default is 0.25).',
  'heVRatio': ' The number of He atoms allowed per V in a bubble.',
  'migrationThreshold': ' Set a limit on the migration energy above which the diffusion will be ignored.'}
+
+def check_input_params(input_params, def_params=param_def):
+        if not input_params:
+            raise ValueError('input_params is empty!')
+        print(input_params)
+        for k in input_params.keys():
+            if k not in list(def_params.keys()) and k!='':
+                raise ValueError('keyword {} as input parameter is unknown. Known params: {}'.format(k, list(def_params.keys())))
+                
 class XolotlFlux():    
     @classinstancemethod
     def generate_particle_flux(self,time, func, **kwargs):
@@ -150,6 +159,9 @@ class XolotlInput(XolotlFlux, XolotlTridyn):
         for k,v in gen:
             print('{} : {}'.format(k,v))
             
+    def set_input_param(self,k,v):
+        self.input_params[k] = v
+        
     @classinstancemethod        
     def get_input_params(self,inputdata:dict or str)-> None:
         if type(inputdata==dict):
@@ -298,12 +310,8 @@ class XolotlInput(XolotlFlux, XolotlTridyn):
         return dict((k,_parse_arg(v)) for k,v in inputdict.items())
 
     def check_input_params(self):
-        if not self.input_params:
-            raise ValueError('input_params is empty!')
-        print(self.input_params)
-        for k in self.input_params.keys():
-            if k not in list(self.def_params.keys()) and k!='':
-                raise ValueError('keyword {} as input parameter is unknown. Known params: {}'.format(k, list(self.def_params.keys())))
+        check_input_params(self.input_params, self.def_params)
+
                 
     def _set_paramdef(self,filename='/fusion/projects/boundary/guterlj/parameters_def.txt'):
         self.def_params = self.read_paramdef(filename)
